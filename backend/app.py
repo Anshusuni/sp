@@ -12,33 +12,46 @@ CORS(app)
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Allow up to 16MB uploads
 
+# Ensure upload directory exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client['image_analysis']
 collection = db['results']
-
-@app.route('/analyze', methods=['POST'])
-def analyze():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-
-    file = request.files['image']
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-
-    # Dummy analysis
-    result = {"filename": filename, "message": "Analysis complete!"}
-
-    # Save to MongoDB
-    collection.insert_one(result)
-
-    return jsonify(result), 200
 
 @app.route('/')
 def home():
     return "Server running!"
 
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    print("Request received at /analyze")
+
+    if 'image' not in request.files:
+        print("No image found in request.")
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    file = request.files['image']
+    filename = secure_filename(file.filename)
+    if not filename:
+        print("Filename is empty or unsafe.")
+        return jsonify({'error': 'Invalid filename'}), 400
+
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    print(f"Image saved to {filepath}")
+
+    # Dummy analysis result
+    result = {"filename": filename, "message": "Analysis complete!"}
+
+    # Store result in MongoDB
+    collection.insert_one(result)
+    print(f"Stored result in MongoDB: {result}")
+
+    return jsonify(result), 200
+
 if __name__ == '__main__':
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
