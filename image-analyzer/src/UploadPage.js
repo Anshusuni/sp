@@ -8,18 +8,38 @@ function UploadPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image) return;
+    if (!image) {
+      alert('Please select an image.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('image', image);
 
-    const response = await axios.post('https://sp-2-nusn.onrender.com/analyze', formData);
-    navigate('/result', { state: response.data });
+    try {
+      const response = await axios.post(
+        'https://sp-2-nusn.onrender.com/analyze',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      navigate('/result', { state: response.data });
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Upload failed. Please check the console or try again later.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files[0])}
+      />
       <button type="submit">Analyze</button>
     </form>
   );
