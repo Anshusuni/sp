@@ -13,7 +13,7 @@ function UploadPage() {
     const formData = new FormData();
     formData.append('image', image);
 
-    const response = await axios.post('https://<render-backend-url>/analyze', formData);
+    const response = await axios.post('https://sp-2-nusn.onrender.com/analyze', formData);
     navigate('/result', { state: response.data });
   };
 
