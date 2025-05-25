@@ -27,19 +27,15 @@ function UploadPage() {
         }
       );
       navigate('/result', { state: response.data });
-    } catch (err) {
-      console.error('Error uploading image:', err);
-      alert('Upload failed. Please check the console or try again later.');
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image. See console for details.');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImage(e.target.files[0])}
-      />
+      <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />
       <button type="submit">Analyze</button>
     </form>
   );
