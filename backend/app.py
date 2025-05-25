@@ -4,18 +4,31 @@ import os
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 from dotenv import load_dotenv
-
+import logging
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'uploads'
+
+if not os.path.isdir(UPLOAD_FOLDER):
+    try:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        logging.info(f"Created directory: {UPLOAD_FOLDER}")
+    except Exception as e:
+        logging.error(f"Failed to create upload folder: {e}")
+
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Allow up to 16MB uploads
 
 # Ensure upload directory exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+
+
 
 # MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
