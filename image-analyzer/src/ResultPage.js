@@ -1,3 +1,4 @@
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 
 function ResultPage() {
@@ -5,8 +6,12 @@ function ResultPage() {
 
   return (
     <div>
-      <h2>Result:</h2>
-      <p>{JSON.stringify(state)}</p>
+      <h2>Analysis Result:</h2>
+      {state ? (
+        <pre>{JSON.stringify(state, null, 2)}</pre>
+      ) : (
+        <p>No result available.</p>
+      )}
     </div>
   );
 }
