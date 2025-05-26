@@ -15,15 +15,14 @@ function App() {
     const formData = new FormData();
     formData.append('image', image);
 
-   const handleUpload = async () => {
-  try {
-    const res = await axios.post('https://sp-3.onrender.com/analyze', formData);
-    setResult(`Predicted Class: ${res.data.predicted_class}`);
-  } catch (err) {
-    console.error(err);
-    setResult('Error analyzing image');
-  }
-};
+   try {
+  const res = await axios.post('https://sp-3.onrender.com/analyze', formData);
+  setResult(`Predicted Class: ${res.data.predicted_class}`);
+} catch (err) {
+  console.error(err);
+  setResult('Error analyzing image');
+}
+
 
 
   return (
