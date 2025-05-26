@@ -13,6 +13,9 @@ CORS(app)
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["image_analysis"]
 collection = db["images"]
+@app.route("/")
+def home():
+    return "Backend running"
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
