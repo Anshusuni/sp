@@ -15,14 +15,16 @@ function App() {
     const formData = new FormData();
     formData.append('image', image);
 
-    try {
-      const res = await axios.post('https://sp-3.onrender.com/analyze', formData);
-      setResult(res.data.result);
-    } catch (err) {
-      console.error(err);
-      setResult('Error analyzing image');
-    }
-  };
+   try {
+  const res = await axios.post('https://sp-3.onrender.com/analyze', formData);
+  console.log(res.data);  // Inspect what's returned
+
+  // Access the prediction and update the state or UI
+  setResult(`Predicted Class: ${res.data.predicted_class}`);
+} catch (err) {
+  console.error(err);
+  setResult('Error analyzing image');
+};
 
   return (
     <div className="App" style={{ padding: 20 }}>
