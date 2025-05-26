@@ -1,16 +1,34 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import UploadPage from 'image-analyzer/src/UploadPage.js';
-import ResultPage from 'image-analyzer/src/ResultPage.js';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function App() {
+  const [image, setImage] = useState(null);
+  const [result, setResult] = useState('');
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleAnalyze = async () => {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+      const res = await axios.post('https://sp-3.onrender.com/analyze', formData);
+      setResult(res.data.result);
+    } catch (err) {
+      console.error(err);
+      setResult('Error analyzing image');
+    }
+  };
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<UploadPage />} />
-        <Route path="/result" element={<ResultPage />} />
-      </Routes>
-    </Router>
+    <div className="App" style={{ padding: 20 }}>
+      <h2>Image Analyzer</h2>
+      <input type="file" onChange={handleImageChange} />
+      <button onClick={handleAnalyze}>Analyze</button>
+      <p><strong>Result:</strong> {result}</p>
+    </div>
   );
 }
 
