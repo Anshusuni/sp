@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './App.css'; // Add this at the top of your App.js
+
 
 function App() {
   const [image, setImage] = useState(null);
