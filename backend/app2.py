@@ -60,7 +60,7 @@ def analyze():
     predicted_class = np.argmax(prediction, axis=1)[0]  # adjust depending on model
 
     # Dummy mapping — replace with your actual class labels
-    labels = ['cat', 'dog', 'elephant']
+    labels = ['boron', 'healthy']
     result_label = labels[predicted_class] if predicted_class < len(labels) else str(predicted_class)
 
     return jsonify({
