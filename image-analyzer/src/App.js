@@ -5,7 +5,7 @@ function App() {
   const [image, setImage] = useState(null);
   const [result, setResult] = useState('');
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e) => { 
     setImage(e.target.files[0]);
   };
 
