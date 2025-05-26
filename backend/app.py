@@ -28,7 +28,7 @@ model = load_model("b-h-1000.h5")
 # Dummy preprocessing — adjust based on your model’s input shape
 def preprocess_image(img_bytes):
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-    img = img.resize((224, 224))  # Example size, adjust as per your model
+    img = img.resize((150, 150))  # Example size, adjust as per your model
     img_array = keras_image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = img_array / 255.0  # Normalize if your model expects it
