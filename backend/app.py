@@ -23,7 +23,7 @@ db = client["image_analysis"]
 collection = db["images"]
 
 # Load your model once
-model = load_model("b.h5")
+model = load_model("b-h-1000.h5")
 
 # Dummy preprocessing — adjust based on your model’s input shape
 def preprocess_image(img_bytes):
