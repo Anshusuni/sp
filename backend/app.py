@@ -1,70 +1,34 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-from werkzeug.utils import secure_filename
 from pymongo import MongoClient
+from bson import Binary
+import os
 from dotenv import load_dotenv
-import logging
+
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-UPLOAD_FOLDER = 'uploads'
-UPLOAD_FOLDER = 'uploads'
-
-if not os.path.isdir(UPLOAD_FOLDER):
-    try:
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        logging.info(f"Created directory: {UPLOAD_FOLDER}")
-    except Exception as e:
-        logging.error(f"Failed to create upload folder: {e}")
-
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Allow up to 16MB uploads
-
-# Ensure upload directory exists
-
-
-
-
-
-# MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
-db = client['image_analysis']
-collection = db['results']
+db = client["image_analysis"]
+collection = db["images"]
 
-@app.route('/')
-def home():
-    return "Server running!"
-
-@app.route('/analyze', methods=['POST'])
+@app.route("/analyze", methods=["POST"])
 def analyze():
-    print("Request received at /analyze")
-
     if 'image' not in request.files:
-        print("No image found in request.")
-        return jsonify({'error': 'No file uploaded'}), 400
+        return jsonify({"error": "No file uploaded"}), 400
 
-    file = request.files['image']
-    filename = secure_filename(file.filename)
-    if not filename:
-        print("Filename is empty or unsafe.")
-        return jsonify({'error': 'Invalid filename'}), 400
+    image = request.files['image']
+    image_data = image.read()
 
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-    print(f"Image saved to {filepath}")
+    # Store in MongoDB
+    collection.insert_one({
+        "filename": image.filename,
+        "data": Binary(image_data)
+    })
 
-    # Dummy analysis result
-    result = {"filename": filename, "message": "Analysis complete!"}
+    # Dummy analysis (replace with real model logic)
+    result = f"Image {image.filename} received and stored."
 
-    # Store result in MongoDB
-    collection.insert_one(result)
-    print(f"Stored result in MongoDB: {result}")
-
-    return jsonify(result), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return jsonify({"result": result})
