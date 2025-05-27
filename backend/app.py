@@ -22,7 +22,7 @@ db = client["image_analysis"]
 collection = db["images"]
 
 # Load the trained model once
-model = load_model("./b-h-1000.h5")
+model = load_model("backend/b-h-1000.h5")
 
 # Define the class labels your model was trained on
 class_labels = ['Boron', 'healthy']
@@ -42,31 +42,30 @@ def home():
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    if 'image' not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No file uploaded"}), 400
 
-    image_file = request.files['image']
-    image_data = image_file.read()
+        image_file = request.files['image']
+        image_data = image_file.read()
 
-    # Optional: Store image in MongoDB
-    collection.insert_one({
-        "filename": image_file.filename,
-        "data": Binary(image_data)
-    })
+        # Store image in MongoDB
+        collection.insert_one({
+            "filename": image_file.filename,
+            "data": Binary(image_data)
+        })
 
-    # Preprocess and predict
-    processed = preprocess_image(image_data)
-    prediction = model.predict(processed)
+        processed = preprocess_image(image_data)
+        prediction = model.predict(processed)
 
-    # Get predicted class
-    predicted_index = np.argmax(prediction, axis=1)[0]
-    predicted_class = class_labels[predicted_index]
+        predicted_index = np.argmax(prediction, axis=1)[0]
+        predicted_class = class_labels[predicted_index]
 
-    return jsonify({
-        "filename": image_file.filename,
-        "predicted_class": predicted_class,
-        "raw_output": prediction.tolist()
-    })
+        return jsonify({
+            "filename": image_file.filename,
+            "predicted_class": predicted_class,
+            "raw_output": prediction.tolist()
+        })
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
