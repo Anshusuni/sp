@@ -22,7 +22,7 @@ db = client["image_analysis"]
 collection = db["images"]
 
 # Load the trained model once
-model = load_model("backend/b-h-1000.h5")
+model = load_model("./b-h-1000.h5")
 
 # Define the class labels your model was trained on
 class_labels = ['Boron', 'healthy']
