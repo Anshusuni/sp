@@ -4,7 +4,6 @@ from pymongo import MongoClient
 from bson import Binary
 import os
 from dotenv import load_dotenv
-from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as keras_image
 from PIL import Image
 import numpy as np
@@ -16,18 +15,15 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Connect to MongoDB
+# MongoDB connection
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["image_analysis"]
 collection = db["images"]
 
-# Load the trained model once
-model = load_model("./b-h-1000.h5")
-
-# Define the class labels your model was trained on
+# Class labels
 class_labels = ['Boron', 'healthy']
 
-# Image preprocessing function
+# Preprocessing function
 def preprocess_image(img_bytes):
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
     img = img.resize((150, 150))  # Match training size
@@ -43,21 +39,27 @@ def home():
 @app.route("/analyze", methods=["POST"])
 def analyze():
     try:
+        # ✅ Lazy-load the model only when needed
+        from tensorflow.keras.models import load_model
+        model = load_model("b-h-1000.h5")
+
         if 'image' not in request.files:
             return jsonify({"error": "No file uploaded"}), 400
 
         image_file = request.files['image']
         image_data = image_file.read()
 
-        # Store image in MongoDB
+        # Optional: Save to MongoDB
         collection.insert_one({
             "filename": image_file.filename,
             "data": Binary(image_data)
         })
 
+        # Preprocess and predict
         processed = preprocess_image(image_data)
         prediction = model.predict(processed)
 
+        # Classify
         predicted_index = np.argmax(prediction, axis=1)[0]
         predicted_class = class_labels[predicted_index]
 
@@ -69,3 +71,6 @@ def analyze():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
