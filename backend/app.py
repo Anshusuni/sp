@@ -10,27 +10,30 @@ from PIL import Image
 import numpy as np
 import io
 
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# Connect to MongoDB
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["image_analysis"]
 collection = db["images"]
 
-# Load model once
+# Load the trained model once
 model = load_model("backend/b-h-1000.h5")
 
-# Define your two class names
-class_labels = ['Boron', 'healthy']  # 🔁 Replace with your actual class names
+# Define the class labels your model was trained on
+class_labels = ['Boron', 'healthy']
 
+# Image preprocessing function
 def preprocess_image(img_bytes):
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
     img = img.resize((150, 150))  # Match training size
     img_array = keras_image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0  # normalize
+    img_array = img_array / 255.0  # Normalize to [0, 1]
     return img_array
 
 @app.route("/")
@@ -45,17 +48,17 @@ def analyze():
     image_file = request.files['image']
     image_data = image_file.read()
 
-    # Store image (optional)
+    # Optional: Store image in MongoDB
     collection.insert_one({
         "filename": image_file.filename,
         "data": Binary(image_data)
     })
 
-    # Predict
+    # Preprocess and predict
     processed = preprocess_image(image_data)
     prediction = model.predict(processed)
 
-    # Binary classification
+    # Get predicted class
     predicted_index = np.argmax(prediction, axis=1)[0]
     predicted_class = class_labels[predicted_index]
 
@@ -64,3 +67,6 @@ def analyze():
         "predicted_class": predicted_class,
         "raw_output": prediction.tolist()
     })
+
+if __name__ == "__main__":
+    app.run(debug=True)
