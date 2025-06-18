@@ -12,7 +12,7 @@ import io
 import cv2
 
 # Read and display the background image
-img = cv2.imread('background.jpg')
+img = cv2.imread('h_32.jpg')
 cv2.imshow("Background Image", img)
 
 cv2.waitKey(0)
