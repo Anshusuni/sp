@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css'; // Optional: Make sure this file exists or comment it out
+const [imagePreview, setImagePreview] = useState(null);
 
 function App() {
   const [image, setImage] = useState(null);
+   const [imagePreview, setImagePreview] = useState(null);
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false); // 👈 Loading state
 
