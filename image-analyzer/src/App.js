@@ -1,5 +1,6 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import axios from 'axios';
 import './App.css'; // Optional: Make sure this file exists or comment it out
 const [imagePreview, setImagePreview] = useState(null);
