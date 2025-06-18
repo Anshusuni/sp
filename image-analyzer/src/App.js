@@ -35,15 +35,31 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ padding: 20 }}>
-      <h2>Banana Leaf Nutrient Analyzer</h2>
-      <input type="file" onChange={handleImageChange} />
-      <button onClick={handleAnalyze} disabled={loading}>
-        {loading ? 'Analyzing...' : 'Analyze'}
-      </button>
-      <p><strong>Result:</strong> {loading ? 'Loading...' : result}</p>
-    </div>
-  );
+  <div className="App" style={{ padding: 20 }}>
+    <h2>Banana Leaf Nutrient Analyzer</h2>
+    <input type="file" accept="image/*" onChange={handleImageChange} />
+
+    {imagePreview && (
+      <div style={{ marginTop: 20 }}>
+        <p><strong>Preview:</strong></p>
+        <img src={imagePreview} alt="Uploaded preview" style={{ maxWidth: '300px', height: 'auto' }} />
+      </div>
+    )}
+
+    <button onClick={handleAnalyze} disabled={loading}>
+      {loading ? 'Analyzing...' : 'Analyze'}
+    </button>
+
+    <p><strong>Result:</strong> {loading ? 'Loading...' : result}</p>
+  </div>
+);
+
+useEffect(() => {
+  return () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+  };
+}, [imagePreview]);
+
 }
 
 export default App;
