@@ -36,7 +36,7 @@ function App() {
 
   return (
     <div className="App" style={{ padding: 20 }}>
-      <h2>Image Analyzer</h2>
+      <h2>Banana Leaf Nutrient Analyzer</h2>
       <input type="file" onChange={handleImageChange} />
       <button onClick={handleAnalyze} disabled={loading}>
         {loading ? 'Analyzing...' : 'Analyze'}
