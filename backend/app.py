@@ -9,6 +9,17 @@ from PIL import Image
 import numpy as np
 import io
 
+import cv2
+
+# Read and display the background image
+img = cv2.imread('background.jpg')
+cv2.imshow("Background Image", img)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
 # Load environment variables
 load_dotenv()
 
